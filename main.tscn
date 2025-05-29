@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://xnct05loswxe"]
+
+[ext_resource type="Script" uid="uid://cnonkj24n01av" path="res://main.gd" id="1_ig7tw"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_ig7tw")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MainMenuUI" type="CenterContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/MainMenuUI"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[wave freq=3 amp=10]Press any key to play...[/wave]"
+fit_content = true
+autowrap_mode = 0
