@@ -9,12 +9,24 @@ const DROP_TICK_TIME=0.05
 var tick_time=1.0
 
 var pieces:Dictionary[String, Array]={
-	"i":[[0, 0, 0, 0],[1, 1, 1, 1],[0, 0, 0 ,0],[0, 0, 0, 0]]
+	"o":[[1, 1], [1, 1]],
+	"i":[[0, 0, 0, 0],[1, 1, 1, 1],[0, 0, 0 ,0],[0, 0, 0, 0]],
+	"l":[[0, 0, 1], [1, 1, 1], [0, 0, 0]],
+	"j":[[1, 0, 0], [1, 1, 1], [0, 0, 0]],
+	"s":[[0, 1, 1], [1, 1, 0], [0, 0, 0]],
+	"z":[[1, 1, 0], [0, 1, 1], [0, 0, 0]],
+	"t":[[0, 1, 0], [1, 1, 1], [0, 0, 0]]
 }
 var current_piece:tetromino=null
+var piece_index:int=0
+var bag_index:int=0
+var bag:Array=[['o', 'i', 'l', 'j', 's', 'z', 't'], ['o', 'i', 'l', 'j', 's', 'z', 't']]
 
 func _ready():
+	randomize()
 	fill_game_grid()
+	for element:Array in bag:
+		element.shuffle()
 	if current_piece==null:
 		spawn_piece()
 
@@ -25,13 +37,11 @@ func _draw():
 				draw_rect(Rect2(x*4, y*4, 2, 2), Color.DARK_BLUE, true, -1.0, true)
 	for x in range(current_piece.cells.size()):
 		for y in range(current_piece.cells.size()):
-			if current_piece.cells[x][y] != 0:
+			if current_piece.cells[y][x] != 0:
 				draw_rect(Rect2((x+current_piece.piece_position.x)*4, (y+current_piece.piece_position.y)*4, 2, 2), Color.RED, true, -1.0, true)
 
 func render():
 	#inside the delayed clock timer
-	if current_piece==null:
-		spawn_piece()
 	
 	queue_redraw()
 	#spawn piece into game grid
@@ -56,6 +66,10 @@ func _input(event):
 		%TickTimer.start()
 	elif event.is_action_released("down"):
 		%TickTimer.wait_time=tick_time
+	if event.is_action_pressed("reload"):
+		get_tree().reload_current_scene()
+	if event.is_action_pressed("ui_cancel"):
+		commit_current_piece()
 
 func fill_game_grid():
 	for x in range(grid_width):
@@ -65,9 +79,17 @@ func fill_game_grid():
 		game_grid.append(row)
 
 func spawn_piece():
+	if current_piece != null:
+		current_piece.queue_free()
 	current_piece=tetromino.new()
-	current_piece.cells=pieces.get("i")
-	current_piece.piece_position=Vector2(5, 2)
+	current_piece.cells=pieces.get(bag[bag_index][piece_index])
+	current_piece.piece_position=Vector2(0, -2)
+	piece_index += 1
+	if piece_index >= 7:
+		piece_index = 0
+		bag_index += 1
+		if bag_index >= 2:
+			bag_index = 0
 
 func move_piece(vec:Vector2):
 	current_piece.piece_position+=vec
@@ -84,6 +106,14 @@ func rotate_piece(direction:int):
 		for j in range(n):
 			result[n - j - 1][i] = current_piece.cells[i][j];
 	current_piece.cells=result
+
+func commit_current_piece():
+	var piece_size:int=current_piece.cells.size()
+	for x in range(piece_size):
+		for y in range(piece_size):
+			if current_piece.cells[y][x] != 0:
+				game_grid[current_piece.piece_position.x + x][current_piece.piece_position.y + y] = 1
+	spawn_piece()
 
 func _on_gravity_timer_timeout():
 	move_piece(Vector2.DOWN)
