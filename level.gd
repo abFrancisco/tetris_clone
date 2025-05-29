@@ -20,7 +20,7 @@ var pieces:Dictionary[String, Array]={
 var current_piece:tetromino=null
 var piece_index:int=0
 var bag_index:int=0
-var bag:Array=[['o', 'i', 'l', 'j', 's', 'z', 't'], ['o', 'i', 'l', 'j', 's', 'z', 't']]
+var bag:Array=[['i', 'i', 'i', 'i', 'i', 'i', 'i'], ['o', 'i', 'l', 'j', 's', 'z', 't']]
 
 func _ready():
 	randomize()
@@ -33,6 +33,7 @@ func _ready():
 func _draw():
 	for x in range(game_grid.size()):
 		for y in range(game_grid[0].size()):
+			draw_rect(Rect2(x*4, y*4, 4, 4), Color.BLACK, false, -1.0, false)
 			if game_grid[x][y] != 0:
 				draw_rect(Rect2(x*4, y*4, 2, 2), Color.DARK_BLUE, true, -1.0, true)
 	for x in range(current_piece.cells.size()):
@@ -92,20 +93,45 @@ func spawn_piece():
 			bag_index = 0
 
 func move_piece(vec:Vector2):
-	current_piece.piece_position+=vec
+	#add tests before applying position
+	current_piece.piece_position += vec
+	if is_current_piece_overlapping():
+		current_piece.piece_position -= vec
+		#if vec==Vector2.DOWN:
+			#commit_current_piece()
 	render()
 
 func rotate_piece(direction:int):
+	#add tests before applying rotation
 	var n:int = current_piece.cells.size()
-	print("rotate")
 	var result:Array[Array]
+	var temp:Array
 	result.resize(n)
 	for i in range(n):
 		result[i].resize(n)
 	for i in range(n):
 		for j in range(n):
 			result[n - j - 1][i] = current_piece.cells[i][j];
+	temp=current_piece.cells
 	current_piece.cells=result
+	if is_current_piece_overlapping():
+		current_piece.cells=temp
+	
+
+func is_current_piece_overlapping()->bool:
+	#check if piece is overllaping the map commited pieces.
+	var piece_size:int = current_piece.cells.size()
+	var cp_x=current_piece.piece_position.x
+	var cp_y=current_piece.piece_position.y
+	for x in range(piece_size):
+		for y in range(piece_size):
+			if current_piece.cells[y][x] != 0:
+				print("thingy   x="+str(x)+"   y="+str(y))
+				if (cp_y + y >= 20):
+					return true
+				if (cp_x + x < 0 or cp_x + x >= 10):
+					return true
+	return false
 
 func commit_current_piece():
 	var piece_size:int=current_piece.cells.size()
