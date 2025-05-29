@@ -1,0 +1,23 @@
+
+
+	Start with a puzzle game like Tetris. In fact, start with Tetris, 
+	then...
+
+	Make a game like Tetris -- by that I mean simple graphics, 
+	simple rules, simple win and lose states, scoring, and so on. 
+	Try to be creative and make something somewhat unique here.
+
+	At this point you've made two simple 2D games. 
+	Here is where my advice on this has changed in the last couple years.
+	For your next game, I recommend a physics puzzler.
+	This lets you build on what you learned with the first two,
+	while introducing you to physics, the idea of using a strange library
+	(box2d is a great one to play with) and the complexity of making your
+	simple rules work with two systems not designed to work together
+	(your graphics engine and your physics engine).
+
+	Next, platformer
+
+	Next, puzzle platformer or platformer with RPG elements
+
+	Finally, one of the above games (your choice) in 3D.

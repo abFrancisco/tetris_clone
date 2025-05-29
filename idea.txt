@@ -1,0 +1,22 @@
+main title screen that says "click to play"
+
+make it on a colorblind friendly color, or allow color change
+
+main playing field in the middle
+current SCORE on top right
+NEXT piece on middle right
+current LEVEL on bottom right
+
+theres also statistics  for the amount of times each piece was spawned
+in the left, it will be empty if i dont do this
+
+implement grid based system
+
+implement 10x20 board
+
+implement rotation with origin point in pieces, meaning only rotation,
+no translation
+
+implement piece generation using 7 piece bags randomized in order
+
+implement wall kicks
