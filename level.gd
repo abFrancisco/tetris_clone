@@ -33,13 +33,13 @@ func _ready():
 func _draw():
 	for x in range(game_grid.size()):
 		for y in range(game_grid[0].size()):
-			draw_rect(Rect2(x*4 - 1, y*4 - 1, 4, 4), Color.BLACK, false, -1.0, false)
+			draw_rect(Rect2(x*8 - 1, y*8 - 1, 8, 8), Color.BLACK, false, -1.0, false)
 			if game_grid[x][y] != 0:
-				draw_rect(Rect2(x*4, y*4, 2, 2), Color.DARK_BLUE, true, -1.0, true)
+				draw_rect(Rect2(x*8, y*8, 6, 6), Color.DARK_BLUE, true, -1.0, true)
 	for x in range(current_piece.cells.size()):
 		for y in range(current_piece.cells.size()):
 			if current_piece.cells[y][x] != 0:
-				draw_rect(Rect2((x+current_piece.piece_position.x)*4, (y+current_piece.piece_position.y)*4, 2, 2), Color.RED, true, -1.0, true)
+				draw_rect(Rect2((x+current_piece.piece_position.x)*8, (y+current_piece.piece_position.y)*8, 6, 6), Color.RED, true, -1.0, true)
 
 func render():
 	queue_redraw()
@@ -61,6 +61,8 @@ func _input(event):
 		%TickTimer.wait_time=tick_time
 	if event.is_action_pressed("reload"):
 		get_tree().reload_current_scene()
+	if event.is_action_pressed("ui_cancel"):
+		print_game_grid()
 
 func fill_game_grid():
 	for x in range(grid_width):
@@ -129,15 +131,51 @@ func is_current_piece_overlapping()->bool:
 						return true
 	return false
 
+func check_lines(lines:PackedByteArray):
+	var line_clear_queue:PackedByteArray = PackedByteArray()
+	print("lines = " + str(lines))
+	for y in lines:
+		var count:int = 0
+		for x in range(grid_width):
+			if game_grid[x][y] != 0:
+				count += 1
+		if count == 10:
+			line_clear_queue.append(y)
+	clear_lines(line_clear_queue)
+	squash_lines(line_clear_queue)
+
+func clear_lines(lines:PackedByteArray):#i started the array with columns first, so i cant clear whole lines... shame
+	for line in lines:
+		for x in range(grid_width):
+			game_grid[x][line] = 0
+
+#like clear_lines, if lines where arrays, i could clear them, and move them with less resource usage
+func squash_lines(lines:PackedByteArray):#squashing one at a time, might be improved later
+	for line in lines:#this should start with topmost line.
+		for x in range(grid_width):
+			for y in range(line, 0, -1):
+				game_grid[x][y] = game_grid[x][y - 1]
+
+
 func commit_current_piece():
-	print("entered commit function")
+	var commited_lines:PackedByteArray=PackedByteArray()
 	var piece_size:int=current_piece.cells.size()
 	for x in range(piece_size):
 		for y in range(piece_size):
 			if current_piece.cells[y][x] != 0:
+				commited_lines.append(current_piece.piece_position.y + y)
 				game_grid[current_piece.piece_position.x + x][current_piece.piece_position.y + y] = 1
+	check_lines(commited_lines)
 	spawn_piece()
 
+func print_game_grid():
+	var final_string:String
+	for line in game_grid:
+		final_string += "\n"
+		for cell in line:
+			final_string += " "
+			final_string += str(cell)
+	print(final_string)
 
 func _on_tick_timer_timeout():
 	move_piece(Vector2.DOWN)
