@@ -6,7 +6,7 @@ var game_grid:Array[PackedByteArray]
 const MAX_TICK_TIME=1.0
 const MIN_TICK_TIME=0.05
 const DROP_TICK_TIME=0.05
-var tick_time=1.0
+var tick_time=MAX_TICK_TIME
 
 var pieces:Dictionary[String, Array]={
 	"o":[[1, 1], [1, 1]],
@@ -20,7 +20,7 @@ var pieces:Dictionary[String, Array]={
 var current_piece:tetromino=null
 var piece_index:int=0
 var bag_index:int=0
-var bag:Array=[['i', 'i', 'i', 'i', 'i', 'i', 'i'], ['o', 'i', 'l', 'j', 's', 'z', 't']]
+var bag:Array=[['o', 'i', 'l', 'j', 's', 'z', 't'], ['o', 'i', 'l', 'j', 's', 'z', 't']]
 
 func _ready():
 	randomize()
@@ -33,7 +33,7 @@ func _ready():
 func _draw():
 	for x in range(game_grid.size()):
 		for y in range(game_grid[0].size()):
-			draw_rect(Rect2(x*4, y*4, 4, 4), Color.BLACK, false, -1.0, false)
+			draw_rect(Rect2(x*4 - 1, y*4 - 1, 4, 4), Color.BLACK, false, -1.0, false)
 			if game_grid[x][y] != 0:
 				draw_rect(Rect2(x*4, y*4, 2, 2), Color.DARK_BLUE, true, -1.0, true)
 	for x in range(current_piece.cells.size()):
@@ -42,15 +42,7 @@ func _draw():
 				draw_rect(Rect2((x+current_piece.piece_position.x)*4, (y+current_piece.piece_position.y)*4, 2, 2), Color.RED, true, -1.0, true)
 
 func render():
-	#inside the delayed clock timer
-	
 	queue_redraw()
-	#spawn piece into game grid
-	#maintain control using "func _input" and "gravity"
-	#commit the piece when it cant move anymore, check collisoins
-	#REPEAT
-	
-	#MISSING A WAY TO REDUCE TRIGGER TIME for example when pressin down button
 
 func _input(event):
 	if event.is_action_pressed("left"):
@@ -69,8 +61,6 @@ func _input(event):
 		%TickTimer.wait_time=tick_time
 	if event.is_action_pressed("reload"):
 		get_tree().reload_current_scene()
-	if event.is_action_pressed("ui_cancel"):
-		commit_current_piece()
 
 func fill_game_grid():
 	for x in range(grid_width):
@@ -94,11 +84,15 @@ func spawn_piece():
 
 func move_piece(vec:Vector2):
 	#add tests before applying position
+	print("------------------------")
+	print("piece_position 1 - "+str(current_piece.piece_position))
 	current_piece.piece_position += vec
+	print("piece_position 1 - "+str(current_piece.piece_position))
 	if is_current_piece_overlapping():
 		current_piece.piece_position -= vec
-		#if vec==Vector2.DOWN:
-			#commit_current_piece()
+		print("piece_position 1 - "+str(current_piece.piece_position))
+		if vec==Vector2.DOWN:
+			commit_current_piece()
 	render()
 
 func rotate_piece(direction:int):
@@ -126,14 +120,17 @@ func is_current_piece_overlapping()->bool:
 	for x in range(piece_size):
 		for y in range(piece_size):
 			if current_piece.cells[y][x] != 0:
-				print("thingy   x="+str(x)+"   y="+str(y))
 				if (cp_y + y >= 20):
 					return true
 				if (cp_x + x < 0 or cp_x + x >= 10):
 					return true
+				if (cp_y + y >=0):#this is still slightly weird, look into it later, why is it overlapping on different positions
+					if (game_grid[cp_x + x][cp_y + y] != 0):
+						return true
 	return false
 
 func commit_current_piece():
+	print("entered commit function")
 	var piece_size:int=current_piece.cells.size()
 	for x in range(piece_size):
 		for y in range(piece_size):
@@ -141,5 +138,6 @@ func commit_current_piece():
 				game_grid[current_piece.piece_position.x + x][current_piece.piece_position.y + y] = 1
 	spawn_piece()
 
-func _on_gravity_timer_timeout():
+
+func _on_tick_timer_timeout():
 	move_piece(Vector2.DOWN)
