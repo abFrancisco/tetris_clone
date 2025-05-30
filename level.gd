@@ -72,11 +72,15 @@ func fill_game_grid():
 		game_grid.append(row)
 
 func spawn_piece():
+	var selected_piece:String = bag[bag_index][piece_index]
 	if current_piece != null:
 		current_piece.queue_free()
 	current_piece=tetromino.new()
-	current_piece.cells=pieces.get(bag[bag_index][piece_index])
-	current_piece.piece_position=Vector2(0, -2)
+	current_piece.cells=pieces.get(selected_piece)
+	if (selected_piece == "o" or selected_piece == "i"):
+		current_piece.piece_position=Vector2(grid_width / 2 - current_piece.cells.size() / 2, -1)
+	else:
+		current_piece.piece_position=Vector2(grid_width / 2 - current_piece.cells.size() / 2 - 1, -1)
 	piece_index += 1
 	if piece_index >= 7:
 		piece_index = 0

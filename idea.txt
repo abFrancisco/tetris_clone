@@ -1,6 +1,9 @@
-main title screen that says "click to play"
+implement piece "kicking", for example when close to a wall that would
+prevent you from rotating, it will rotate the piece and place it further from the wall
 
-make it on a colorblind friendly color, or allow color change
+main title screen that says "click to play" DONE
+
+make it on a colorblind friendly color, or allow color change 
 
 main playing field in the middle
 current SCORE on top right
