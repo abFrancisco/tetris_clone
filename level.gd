@@ -1,5 +1,6 @@
 extends Node2D
 
+var main_scene:PackedScene = preload("res://main.tscn")
 var grid_height:int=20
 var grid_width:int=10
 var game_grid:Array[PackedByteArray]
@@ -133,7 +134,7 @@ func rotate_piece(direction:int):
 			result[n - j - 1][i] = current_piece.cells[i][j];
 	temp=current_piece.cells
 	current_piece.cells=result
-	if is_current_piece_overlapping():
+	if is_current_piece_overlapping():#Implement kicking here????? maybe???
 		current_piece.cells=temp
 	
 
@@ -181,7 +182,7 @@ func squash_lines(lines:PackedByteArray):#squashing one at a time, might be impr
 
 
 func commit_current_piece():
-	var commited_lines:PackedByteArray=PackedByteArray()
+	var commited_lines:Array=Array()
 	var piece_size:int=current_piece.cells.size()
 	print("------------------------------")
 	for x in range(piece_size):
@@ -191,6 +192,9 @@ func commit_current_piece():
 					commited_lines.append(current_piece.piece_position.y + y)
 				print("commiting line -> " + str(current_piece.piece_position.y + y))
 				game_grid[current_piece.piece_position.x + x][current_piece.piece_position.y + y] = 1
+	for y in commited_lines:
+		if y <= 0:
+			game_over()
 	check_lines(commited_lines)
 	spawn_piece()
 
@@ -208,6 +212,8 @@ func _on_tick_timer_timeout():
 	#previous_time = Time.get_ticks_msec()
 	move_piece(Vector2.DOWN)
 
+func game_over():
+	get_tree().change_scene_to_packed(main_scene)
 #func process_timer_timeout():
 	#print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
 	#previous_time = Time.get_ticks_msec()
