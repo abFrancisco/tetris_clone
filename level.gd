@@ -155,8 +155,8 @@ func is_current_piece_overlapping()->bool:
 						return true
 	return false
 
-func check_lines(lines:PackedByteArray):
-	var line_clear_queue:PackedByteArray = PackedByteArray()
+func check_lines(lines:Array):
+	var line_clear_queue:Array = Array()
 	for y in lines:
 		var count:int = 0
 		for x in range(grid_width):
@@ -168,13 +168,13 @@ func check_lines(lines:PackedByteArray):
 	clear_lines(line_clear_queue)
 	squash_lines(line_clear_queue)
 
-func clear_lines(lines:PackedByteArray):#i started the array with columns first, so i cant clear whole lines... shame
+func clear_lines(lines:Array):#i started the array with columns first, so i cant clear whole lines... shame
 	for line in lines:
 		for x in range(grid_width):
 			game_grid[x][line] = 0
 
 #like clear_lines, if lines where arrays, i could clear them, and move them with less resource usage
-func squash_lines(lines:PackedByteArray):#squashing one at a time, might be improved later
+func squash_lines(lines:Array):#squashing one at a time, might be improved later
 	for line in lines:#this should start with topmost line.
 		for x in range(grid_width):
 			for y in range(line, 0, -1):
@@ -213,7 +213,9 @@ func _on_tick_timer_timeout():
 	move_piece(Vector2.DOWN)
 
 func game_over():
-	get_tree().change_scene_to_packed(main_scene)
+	get_tree().call_deferred("change_scene_to_packed", main_scene)
+	#get_tree().change_scene_to_packed(main_scene)
+	
 #func process_timer_timeout():
 	#print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
 	#previous_time = Time.get_ticks_msec()
