@@ -4,9 +4,12 @@ var grid_height:int=20
 var grid_width:int=10
 var game_grid:Array[PackedByteArray]
 const MAX_TICK_TIME=1.0
-const MIN_TICK_TIME=0.05
-const DROP_TICK_TIME=0.05
+const MIN_TICK_TIME=0.01
+const DROP_TICK_TIME=0.01
 var tick_time=MAX_TICK_TIME
+
+var previous_time:int
+var timer_clock:float = 0.0
 
 var pieces:Dictionary[String, Array]={
 	"o":[[1, 1], [1, 1]],
@@ -23,12 +26,20 @@ var bag_index:int=0
 var bag:Array=[['o', 'i', 'l', 'j', 's', 'z', 't'], ['o', 'i', 'l', 'j', 's', 'z', 't']]
 
 func _ready():
+	previous_time = Time.get_ticks_msec()
 	randomize()
 	fill_game_grid()
 	for element:Array in bag:
 		element.shuffle()
 	if current_piece==null:
 		spawn_piece()
+
+func _process(delta):
+	timer_clock += delta
+	print("processing loop")
+	if timer_clock > MIN_TICK_TIME:
+		process_timer_timeout()
+		timer_clock = 0
 
 func _draw():
 	for x in range(game_grid.size()):
@@ -90,13 +101,13 @@ func spawn_piece():
 
 func move_piece(vec:Vector2):
 	#add tests before applying position
-	print("------------------------")
-	print("piece_position 1 - "+str(current_piece.piece_position))
+	#print("------------------------")
+	#print("piece_position 1 - "+str(current_piece.piece_position))
 	current_piece.piece_position += vec
-	print("piece_position 1 - "+str(current_piece.piece_position))
+	#print("piece_position 1 - "+str(current_piece.piece_position))
 	if is_current_piece_overlapping():
 		current_piece.piece_position -= vec
-		print("piece_position 1 - "+str(current_piece.piece_position))
+		#print("piece_position 1 - "+str(current_piece.piece_position))
 		if vec==Vector2.DOWN:
 			commit_current_piece()
 	render()
@@ -182,4 +193,11 @@ func print_game_grid():
 	print(final_string)
 
 func _on_tick_timer_timeout():
+	print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
+	previous_time = Time.get_ticks_msec()
+	move_piece(Vector2.DOWN)
+
+func process_timer_timeout():
+	print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
+	previous_time = Time.get_ticks_msec()
 	move_piece(Vector2.DOWN)
