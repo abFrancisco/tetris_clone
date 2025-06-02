@@ -4,8 +4,8 @@ var grid_height:int=20
 var grid_width:int=10
 var game_grid:Array[PackedByteArray]
 const MAX_TICK_TIME=1.0
-const MIN_TICK_TIME=0.01
-const DROP_TICK_TIME=0.01
+const MIN_TICK_TIME=0.04
+const DROP_TICK_TIME=0.04
 var tick_time=MAX_TICK_TIME
 
 var previous_time:int
@@ -34,17 +34,18 @@ func _ready():
 	if current_piece==null:
 		spawn_piece()
 
-func _process(delta):
-	timer_clock += delta
-	print("processing loop")
-	if timer_clock > MIN_TICK_TIME:
-		process_timer_timeout()
-		timer_clock = 0
+#func _process(delta):
+	#timer_clock += delta
+	#print("processing loop")
+	#if timer_clock > MIN_TICK_TIME:
+		#process_timer_timeout()
+		#timer_clock = 0
 
 func _draw():
 	for x in range(game_grid.size()):
 		for y in range(game_grid[0].size()):
-			draw_rect(Rect2(x*8 - 1, y*8 - 1, 8, 8), Color.BLACK, false, -1.0, false)
+			#DRAW GRID LINES
+			#draw_rect(Rect2(x*8 - 1, y*8 - 1, 8, 8), Color.BLACK, false, -1.0, false)
 			if game_grid[x][y] != 0:
 				draw_rect(Rect2(x*8, y*8, 6, 6), Color.DARK_BLUE, true, -1.0, true)
 	for x in range(current_piece.cells.size()):
@@ -70,6 +71,9 @@ func _input(event):
 		%TickTimer.start()
 	elif event.is_action_released("down"):
 		%TickTimer.wait_time=tick_time
+	if event.is_action_pressed("drop_hard"):
+		while(move_piece(Vector2.DOWN) != "committed"):
+			pass
 	if event.is_action_pressed("reload"):
 		get_tree().reload_current_scene()
 	if event.is_action_pressed("ui_cancel"):
@@ -99,7 +103,9 @@ func spawn_piece():
 		if bag_index >= 2:
 			bag_index = 0
 
-func move_piece(vec:Vector2):
+##Returns "committed" if the move committed a piece
+func move_piece(vec:Vector2)->String:
+	var return_value:String = "moved"
 	#add tests before applying position
 	#print("------------------------")
 	#print("piece_position 1 - "+str(current_piece.piece_position))
@@ -110,7 +116,9 @@ func move_piece(vec:Vector2):
 		#print("piece_position 1 - "+str(current_piece.piece_position))
 		if vec==Vector2.DOWN:
 			commit_current_piece()
+			return_value = "committed"
 	render()
+	return return_value
 
 func rotate_piece(direction:int):
 	#add tests before applying rotation
@@ -148,7 +156,6 @@ func is_current_piece_overlapping()->bool:
 
 func check_lines(lines:PackedByteArray):
 	var line_clear_queue:PackedByteArray = PackedByteArray()
-	print("lines = " + str(lines))
 	for y in lines:
 		var count:int = 0
 		for x in range(grid_width):
@@ -156,6 +163,7 @@ func check_lines(lines:PackedByteArray):
 				count += 1
 		if count == 10:
 			line_clear_queue.append(y)
+	print("line clear queue = " + str(line_clear_queue))
 	clear_lines(line_clear_queue)
 	squash_lines(line_clear_queue)
 
@@ -175,10 +183,13 @@ func squash_lines(lines:PackedByteArray):#squashing one at a time, might be impr
 func commit_current_piece():
 	var commited_lines:PackedByteArray=PackedByteArray()
 	var piece_size:int=current_piece.cells.size()
+	print("------------------------------")
 	for x in range(piece_size):
 		for y in range(piece_size):
 			if current_piece.cells[y][x] != 0:
-				commited_lines.append(current_piece.piece_position.y + y)
+				if not commited_lines.has(current_piece.piece_position.y + y):
+					commited_lines.append(current_piece.piece_position.y + y)
+				print("commiting line -> " + str(current_piece.piece_position.y + y))
 				game_grid[current_piece.piece_position.x + x][current_piece.piece_position.y + y] = 1
 	check_lines(commited_lines)
 	spawn_piece()
@@ -193,11 +204,11 @@ func print_game_grid():
 	print(final_string)
 
 func _on_tick_timer_timeout():
-	print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
-	previous_time = Time.get_ticks_msec()
+	#print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
+	#previous_time = Time.get_ticks_msec()
 	move_piece(Vector2.DOWN)
 
-func process_timer_timeout():
-	print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
-	previous_time = Time.get_ticks_msec()
-	move_piece(Vector2.DOWN)
+#func process_timer_timeout():
+	#print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
+	#previous_time = Time.get_ticks_msec()
+	#move_piece(Vector2.DOWN)
