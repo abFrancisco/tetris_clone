@@ -19,6 +19,7 @@ func _ready():
 				default_scale_factor = scale_factors[i]
 	else:
 		print("just loading from file")
+	print("resolution = " +str(default_resolution))
 	#change this to their own function, to be accessed during game
 	#for example, when changing the settings in the menu
 	DisplayServer.window_set_size(default_resolution)
@@ -27,13 +28,15 @@ func _ready():
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), sfx_volume)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), music_volume)
 	
+	print("resolution = " +str(default_resolution))
 	save_settings()
+	print("resolution = " +str(default_resolution))
 
 ## basically puts variables that need to be saved into a dict
 func get_save_data()->Dictionary:
 	var save_dict:Dictionary = {
-		"default_resolution_x" : default_resolution.x,
-		"default_resolution_y" : default_resolution.y,
+		"default_resolution:x" : default_resolution.x,
+		"default_resolution:y" : default_resolution.y,
 		"default_scale_factor" : default_scale_factor,
 		"sfx_volume" : sfx_volume,
 		"music_volume" : music_volume

@@ -1,13 +1,15 @@
 extends Node2D
 
 var main_scene:PackedScene = preload("res://main.tscn")
-var grid_height:int=20
-var grid_width:int=10
+var cell_size:int = 9
+var cell_margin:int = 2
+var grid_height:int = 20
+var grid_width:int = 10
 var game_grid:Array[PackedByteArray]
-const MAX_TICK_TIME=1.0
-const MIN_TICK_TIME=0.04
-const DROP_TICK_TIME=0.04
-var tick_time=MAX_TICK_TIME
+const MAX_TICK_TIME = 1.0
+const MIN_TICK_TIME = 0.04
+const DROP_TICK_TIME = 0.04
+var tick_time = MAX_TICK_TIME
 
 var previous_time:int
 var timer_clock:float = 0.0
@@ -48,11 +50,11 @@ func _draw():
 			#DRAW GRID LINES
 			#draw_rect(Rect2(x*8 - 1, y*8 - 1, 8, 8), Color.BLACK, false, -1.0, false)
 			if game_grid[x][y] != 0:
-				draw_rect(Rect2(x*8, y*8, 6, 6), Color.DARK_BLUE, true, -1.0, true)
+				draw_rect(Rect2(x * cell_size, y * cell_size, cell_size - cell_margin, cell_size - cell_margin), Color.DARK_BLUE, true, -1.0, true)
 	for x in range(current_piece.cells.size()):
 		for y in range(current_piece.cells.size()):
 			if current_piece.cells[y][x] != 0:
-				draw_rect(Rect2((x+current_piece.piece_position.x)*8, (y+current_piece.piece_position.y)*8, 6, 6), Color.RED, true, -1.0, true)
+				draw_rect(Rect2((x+current_piece.piece_position.x) * cell_size, (y+current_piece.piece_position.y) * cell_size, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
 
 func render():
 	queue_redraw()

@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="tetris_clone_v2"
+config/name="tetris_clone_v2_cs"
 run/main_scene="uid://xnct05loswxe"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
