@@ -1,7 +1,7 @@
 extends Node2D
 
 var main_scene:PackedScene = preload("res://main.tscn")
-var cell_size:int = 9
+var cell_size:int = 8
 var cell_margin:int = 2
 var grid_height:int = 20
 var grid_width:int = 10

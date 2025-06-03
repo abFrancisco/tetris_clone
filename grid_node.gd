@@ -1,6 +1,6 @@
 extends Node2D
 
-var cell_size:int = 9
+var cell_size:int = 8
 var cell_margin:int = 1
 
 func _draw():

@@ -15,22 +15,25 @@ func _ready():
 		print("ERR FILE NOT FOUND, generating settings")
 		for i in range(resolutions.size()):
 			if resolutions[i].x < screen_size.x and resolutions[i].y < screen_size.y:
-				default_resolution = resolutions[i]
-				default_scale_factor = scale_factors[i]
+				update_window_size(i)
+				#default_resolution = resolutions[i]
+				#default_scale_factor = scale_factors[i]
 	else:
-		print("just loading from file")
-	print("resolution = " +str(default_resolution))
-	#change this to their own function, to be accessed during game
-	#for example, when changing the settings in the menu
+		update_window_size(-1)#invalid index, will only update window and wont change settings
+	update_audio_volume()
+	save_settings()
+
+func update_window_size(new_resolution_index:int):
+	if new_resolution_index >= 0 and new_resolution_index < resolutions.size():
+		default_resolution = resolutions[new_resolution_index]# should check if its smaller than screen size
+		default_scale_factor = scale_factors[new_resolution_index]
 	DisplayServer.window_set_size(default_resolution)
 	DisplayServer.window_set_position(Vector2i(0, DisplayServer.window_get_title_size("tetris_clone_v2").y))
 	get_window().content_scale_factor = default_scale_factor
+
+func update_audio_volume():
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), sfx_volume)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), music_volume)
-	
-	print("resolution = " +str(default_resolution))
-	save_settings()
-	print("resolution = " +str(default_resolution))
 
 ## basically puts variables that need to be saved into a dict
 func get_save_data()->Dictionary:
