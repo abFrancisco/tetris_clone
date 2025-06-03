@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://dw6w5dawetjtv"]
+
+[node name="SettingsMenu" type="Node"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer"]
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.1
+anchor_right = 0.9
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(139, 72)
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MarginContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="Setting_1" type="HBoxContainer" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_1"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "window mode"
+
+[node name="OptionButton" type="OptionButton" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_1"]
+layout_mode = 2
+item_count = 2
+popup/item_0/text = "windowed"
+popup/item_0/id = 0
+popup/item_1/text = "fullscreen"
+popup/item_1/id = 2
+
+[node name="Setting_2" type="HBoxContainer" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_2"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "resolution"
+
+[node name="OptionButton" type="OptionButton" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_2"]
+layout_mode = 2
+item_count = 3
+popup/item_0/text = "1920x1080"
+popup/item_0/id = 0
+popup/item_1/text = "Separator"
+popup/item_1/id = 1
+popup/item_1/separator = true
+popup/item_2/text = "2560x1440"
+popup/item_2/id = 2
+
+[node name="Setting_3" type="HBoxContainer" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_3"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "SFX volume"
+
+[node name="HSlider" type="HSlider" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_3"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_3"]
+layout_mode = 2
+theme_override_constants/minimum_character_width = 2
+text = "100"
+max_length = 3
+
+[node name="Setting_4" type="HBoxContainer" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_4"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "music volume"
+
+[node name="HSlider" type="HSlider" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_4"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_4"]
+layout_mode = 2
+theme_override_constants/minimum_character_width = 2
+text = "100"
