@@ -35,8 +35,8 @@ func _ready():
 ## basically puts variables that need to be saved into a dict
 func get_save_data()->Dictionary:
 	var save_dict:Dictionary = {
-		"default_resolution:x" : default_resolution.x,
-		"default_resolution:y" : default_resolution.y,
+		"default_resolution_x" : default_resolution.x,
+		"default_resolution_y" : default_resolution.y,
 		"default_scale_factor" : default_scale_factor,
 		"sfx_volume" : sfx_volume,
 		"music_volume" : music_volume
@@ -70,7 +70,9 @@ func load_settings():
 		# Get the data from the JSON object.
 		var node_data = json.data
 		# Now we set the remaining variables.
+		default_resolution = Vector2i(node_data["default_resolution_x"], node_data["default_resolution_y"])
 		for i in node_data.keys():
-			print("setting var " + str(i) + " to value = " + str(node_data[i]))
+			if i == "default_resolution_x" or i == "default_resolution_y":
+				continue
 			set(i, node_data[i])
 	return OK
