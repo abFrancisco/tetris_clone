@@ -21,7 +21,6 @@ func _ready():
 	else:
 		update_window_size(-1)#invalid index, will only update window and wont change settings
 	update_audio_volume()
-	save_settings()
 
 func update_window_size(new_resolution_index:int):
 	if new_resolution_index >= 0 and new_resolution_index < resolutions.size():
@@ -30,10 +29,17 @@ func update_window_size(new_resolution_index:int):
 	DisplayServer.window_set_size(default_resolution)
 	DisplayServer.window_set_position(Vector2i(0, DisplayServer.window_get_title_size("tetris_clone_v2").y))
 	get_window().content_scale_factor = default_scale_factor
+	save_settings()
 
-func update_audio_volume():
+func update_audio_volume(sfx:int = -1, music:int = -1):
+	if sfx >= 0 and sfx <= 100:
+		sfx_volume = sfx
+	if music >= 0 and music <= 100:
+		music_volume = music
+		
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), sfx_volume)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), music_volume)
+	save_settings()
 
 ## basically puts variables that need to be saved into a dict
 func get_save_data()->Dictionary:

@@ -1,6 +1,9 @@
-[gd_scene format=3 uid="uid://dw6w5dawetjtv"]
+[gd_scene load_steps=2 format=3 uid="uid://dw6w5dawetjtv"]
+
+[ext_resource type="Script" uid="uid://chioyl3lx1juc" path="res://settings_menu.gd" id="1_ufg0w"]
 
 [node name="SettingsMenu" type="Node"]
+script = ExtResource("1_ufg0w")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -21,6 +24,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="Setting_1" type="HBoxContainer" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer"]
+visible = false
 layout_mode = 2
 
 [node name="Name" type="Label" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_1"]
@@ -28,13 +32,10 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 text = "window mode"
 
-[node name="OptionButton" type="OptionButton" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_1"]
+[node name="WindowMode" type="OptionButton" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_1"]
+unique_name_in_owner = true
 layout_mode = 2
-item_count = 2
-popup/item_0/text = "windowed"
-popup/item_0/id = 0
-popup/item_1/text = "fullscreen"
-popup/item_1/id = 2
+size_flags_horizontal = 3
 
 [node name="Setting_2" type="HBoxContainer" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -44,16 +45,10 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 text = "resolution"
 
-[node name="OptionButton" type="OptionButton" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_2"]
+[node name="Resolution" type="OptionButton" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_2"]
+unique_name_in_owner = true
 layout_mode = 2
-item_count = 3
-popup/item_0/text = "1920x1080"
-popup/item_0/id = 0
-popup/item_1/text = "Separator"
-popup/item_1/id = 1
-popup/item_1/separator = true
-popup/item_2/text = "2560x1440"
-popup/item_2/id = 2
+size_flags_horizontal = 3
 
 [node name="Setting_3" type="HBoxContainer" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -63,17 +58,23 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 text = "SFX volume"
 
-[node name="HSlider" type="HSlider" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_3"]
+[node name="SFXSlider" type="HSlider" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_3"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="LineEdit" type="LineEdit" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_3"]
+[node name="SFXText" type="LineEdit" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_3"]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 4
 theme_override_constants/minimum_character_width = 2
 text = "100"
+placeholder_text = " -"
 max_length = 3
+emoji_menu_enabled = false
+virtual_keyboard_type = 2
 
 [node name="Setting_4" type="HBoxContainer" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -83,15 +84,26 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 text = "music volume"
 
-[node name="HSlider" type="HSlider" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_4"]
+[node name="MusicSlider" type="HSlider" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_4"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="LineEdit" type="LineEdit" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_4"]
+[node name="MusicText" type="LineEdit" parent="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_4"]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 4
 theme_override_constants/minimum_character_width = 2
 text = "100"
+placeholder_text = " -"
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+
+[connection signal="item_selected" from="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_1/WindowMode" to="." method="_on_window_mode_selected"]
+[connection signal="item_selected" from="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_2/Resolution" to="." method="_on_resolution_selected"]
+[connection signal="value_changed" from="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_3/SFXSlider" to="." method="_on_SFX_volume_changed"]
+[connection signal="text_submitted" from="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_3/SFXText" to="." method="_on_SFX_text_submitted"]
+[connection signal="value_changed" from="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_4/MusicSlider" to="." method="_on_music_volume_changed"]
+[connection signal="text_submitted" from="CanvasLayer/MarginContainer/CenterContainer/VBoxContainer/Setting_4/MusicText" to="." method="_on_music_text_submitted"]
