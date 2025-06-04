@@ -9,6 +9,12 @@ func _ready():
 	
 	%MusicSlider.value = Global.music_volume
 
+func _input(event):
+	if event is InputEventKey:
+		if not event.is_echo():
+			if event.is_pressed():
+				if event.keycode == KEY_ESCAPE:
+					get_tree().change_scene_to_file("res://main.tscn")
 
 func _on_window_mode_selected(index):
 	pass # Replace with function body.
