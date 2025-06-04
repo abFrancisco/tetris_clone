@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1r5xhwpblk0r"]
+
+[ext_resource type="Script" uid="uid://bl4lqvy4asceq" path="res://level.gd" id="1_u52ul"]
+[ext_resource type="Script" uid="uid://dqpjmknt76tad" path="res://grid_node.gd" id="2_vonw3"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("1_u52ul")
+
+[node name="TickTimer" type="Timer" parent="."]
+unique_name_in_owner = true
+autostart = true
+
+[node name="grid_node" type="Node2D" parent="."]
+z_index = -1
+script = ExtResource("2_vonw3")
+
+[connection signal="timeout" from="TickTimer" to="." method="_on_tick_timer_timeout"]

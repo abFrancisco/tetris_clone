@@ -28,6 +28,7 @@ var next_piece:tetromino=null
 var piece_index:int=0
 var bag_index:int=0
 var bag:Array=[['o', 'i', 'l', 'j', 's', 'z', 't'], ['o', 'i', 'l', 'j', 's', 'z', 't']]
+enum OVERLAP{NONE, WALL, FLOOR, PIECE}
 
 func _ready():
 	previous_time = Time.get_ticks_msec()
@@ -69,10 +70,10 @@ func render():
 
 func _input(event):
 	if event.is_action_pressed("left"):
-		move_piece(Vector2.LEFT)
+		move_piece(Vector2i.LEFT)
 		render()
 	elif event.is_action_pressed("right"):
-		move_piece(Vector2.RIGHT)
+		move_piece(Vector2i.RIGHT)
 		render()
 	if event.is_action_pressed("rotate_left"):
 		rotate_piece(COUNTERCLOCKWISE)
@@ -89,7 +90,7 @@ func _input(event):
 	elif event.is_action_released("down"):
 		%TickTimer.wait_time=tick_time
 	if event.is_action_pressed("drop_hard"):
-		while(move_piece(Vector2.DOWN) != "committed"):
+		while(move_piece(Vector2i.DOWN) != "committed"):
 			pass
 	if event.is_action_pressed("reload"):
 		get_tree().reload_current_scene()
@@ -147,17 +148,19 @@ func get_next_piece()->String:
 	return bag[next_bag_index][next_piece_index]
 
 ##Returns "committed" if the move committed a piece
-func move_piece(vec:Vector2)->String:
+func move_piece(vec:Vector2i)->String:
 	var return_value:String = "moved"
+	var overlap:OVERLAP
 	#add tests before applying position
 	#print("------------------------")
 	#print("piece_position 1 - "+str(current_piece.piece_position))
 	current_piece.piece_position += vec
 	#print("piece_position 1 - "+str(current_piece.piece_position))
-	if is_current_piece_overlapping():
+	overlap = get_current_piece_overlap()
+	if overlap != OVERLAP.NONE:
 		current_piece.piece_position -= vec
 		#print("piece_position 1 - "+str(current_piece.piece_position))
-		if vec==Vector2.DOWN:
+		if vec==Vector2i.DOWN:
 			commit_current_piece()
 			return_value = "committed"
 	render()
@@ -168,6 +171,7 @@ func rotate_piece(direction:int):
 	var n:int = current_piece.cells.size()
 	var result:Array[Array]
 	var temp:Array
+	var overlap:OVERLAP
 	result.resize(n)
 	for i in range(n):
 		result[i].resize(n)
@@ -182,11 +186,24 @@ func rotate_piece(direction:int):
 	
 	temp=current_piece.cells
 	current_piece.cells=result
-	if is_current_piece_overlapping():#Implement kicking here????? maybe???
-		current_piece.cells=temp
+	
+	var undo_move:Vector2i = Vector2.ZERO
+	overlap = get_current_piece_overlap()
+	if overlap != OVERLAP.NONE:#Implement kicking here????? maybe??
+		if overlap == OVERLAP.WALL:
+			var move_result
+			if current_piece.piece_position.x < 5:
+				move_result = move_piece(Vector2i.RIGHT)#THIS might cause rendering bug, by calling render() inside move_piece()
+				undo_move = Vector2i.LEFT
+			else:
+				move_result = move_piece(Vector2i.LEFT)
+				undo_move = Vector2i.RIGHT
+			if move_result != "moved":
+				move_piece(undo_move)
+				current_piece.cells=temp
 	
 
-func is_current_piece_overlapping()->bool:
+func get_current_piece_overlap()->OVERLAP:
 	#check if piece is overllaping the map commited pieces.
 	var piece_size:int = current_piece.cells.size()
 	var cp_x=current_piece.piece_position.x
@@ -195,13 +212,13 @@ func is_current_piece_overlapping()->bool:
 		for y in range(piece_size):
 			if current_piece.cells[y][x] != 0:
 				if (cp_y + y >= 20):
-					return true
+					return OVERLAP.FLOOR
 				if (cp_x + x < 0 or cp_x + x >= 10):
-					return true
-				if (cp_y + y >=0):#this is still slightly weird, look into it later, why is it overlapping on different positions
+					return OVERLAP.WALL
+				if (cp_y + y >=0):
 					if (game_grid[cp_x + x][cp_y + y] != 0):
-						return true
-	return false
+						return OVERLAP.PIECE
+	return OVERLAP.NONE
 
 func check_lines(lines:Array):
 	var line_clear_queue:Array = Array()
@@ -258,7 +275,7 @@ func print_game_grid():
 func _on_tick_timer_timeout():
 	print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
 	previous_time = Time.get_ticks_msec()
-	move_piece(Vector2.DOWN)
+	move_piece(Vector2i.DOWN)
 
 func game_over():
 	#without call_deferred i was getting errors sometimes, possibly a godot bug?
