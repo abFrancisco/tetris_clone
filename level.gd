@@ -7,8 +7,8 @@ var grid_height:int = 20
 var grid_width:int = 10
 var game_grid:Array[PackedByteArray]
 const MAX_TICK_TIME = 1.0
-const MIN_TICK_TIME = 0.04
-const DROP_TICK_TIME = 0.04
+const MIN_TICK_TIME = 0.05
+const DROP_TICK_TIME = 0.05
 var tick_time = MAX_TICK_TIME
 
 var previous_time:int
@@ -24,6 +24,7 @@ var pieces:Dictionary[String, Array]={
 	"t":[[0, 1, 0], [1, 1, 1], [0, 0, 0]]
 }
 var current_piece:tetromino=null
+var next_piece:tetromino=null
 var piece_index:int=0
 var bag_index:int=0
 var bag:Array=[['o', 'i', 'l', 'j', 's', 'z', 't'], ['o', 'i', 'l', 'j', 's', 'z', 't']]
@@ -45,16 +46,23 @@ func _ready():
 		#timer_clock = 0
 
 func _draw():
+	#draw commited pieces
 	for x in range(game_grid.size()):
 		for y in range(game_grid[0].size()):
-			#DRAW GRID LINES
-			#draw_rect(Rect2(x*8 - 1, y*8 - 1, 8, 8), Color.BLACK, false, -1.0, false)
 			if game_grid[x][y] != 0:
 				draw_rect(Rect2(x * cell_size, y * cell_size, cell_size - cell_margin, cell_size - cell_margin), Color.DARK_BLUE, true, -1.0, true)
+	#draw current piece
 	for x in range(current_piece.cells.size()):
 		for y in range(current_piece.cells.size()):
 			if current_piece.cells[y][x] != 0:
 				draw_rect(Rect2((x+current_piece.piece_position.x) * cell_size, (y+current_piece.piece_position.y) * cell_size, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
+	#draw next piece
+	for x in range(next_piece.cells.size()):
+		for y in range(next_piece.cells.size()):
+			if next_piece.cells[y][x] != 0:
+				print("drawing next at (" + str(next_piece.piece_position.x + x) +", " + str(next_piece.piece_position.y + y) + ")")
+				draw_rect(Rect2((x+next_piece.piece_position.x) * cell_size, (y+next_piece.piece_position.y) * cell_size, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
+
 
 func render():
 	queue_redraw()
@@ -65,6 +73,12 @@ func _input(event):
 		render()
 	elif event.is_action_pressed("right"):
 		move_piece(Vector2.RIGHT)
+		render()
+	if event.is_action_pressed("rotate_left"):
+		rotate_piece(COUNTERCLOCKWISE)
+		render()
+	elif event.is_action_pressed("rotate_right"):
+		rotate_piece(CLOCKWISE)
 		render()
 	if event.is_action_pressed("up"):
 		rotate_piece(CLOCKWISE)
@@ -90,21 +104,47 @@ func fill_game_grid():
 		game_grid.append(row)
 
 func spawn_piece():
+	#instance the piece
 	var selected_piece:String = bag[bag_index][piece_index]
-	if current_piece != null:
-		current_piece.queue_free()
-	current_piece=tetromino.new()
-	current_piece.cells=pieces.get(selected_piece)
-	if (selected_piece == "o" or selected_piece == "i"):
-		current_piece.piece_position=Vector2(grid_width / 2 - current_piece.cells.size() / 2, -1)
+	if next_piece == null:
+		current_piece = tetromino.new()
+		current_piece.cells = pieces.get(selected_piece)
+		current_piece.type = selected_piece
+		cycle_bag()
+		selected_piece = bag[bag_index][piece_index]
 	else:
-		current_piece.piece_position=Vector2(grid_width / 2 - current_piece.cells.size() / 2 - 1, -1)
+		current_piece = next_piece
+	next_piece = tetromino.new()
+	next_piece.cells = pieces.get(selected_piece)
+	next_piece.type = selected_piece
+	
+	#set piece position
+	if (current_piece.type == "o" or current_piece.type == "i"):
+		current_piece.piece_position=Vector2i(grid_width / 2 - current_piece.cells.size() / 2, -1)
+	else:
+		current_piece.piece_position=Vector2i(grid_width / 2 - current_piece.cells.size() / 2 - 1, -1)
+	next_piece.piece_position = Vector2i(200, 50) / 8
+	cycle_bag()
+
+func cycle_bag():
 	piece_index += 1
 	if piece_index >= 7:
 		piece_index = 0
+		bag[bag_index].shuffle()
 		bag_index += 1
 		if bag_index >= 2:
 			bag_index = 0
+
+func get_next_piece()->String:
+	var next_bag_index:int = bag_index
+	var next_piece_index:int = piece_index + 1
+	
+	if next_piece_index >= pieces.size():
+		next_piece_index = 0
+		next_bag_index += 1
+		if next_bag_index >= bag.size():
+			next_bag_index = 0
+	return bag[next_bag_index][next_piece_index]
 
 ##Returns "committed" if the move committed a piece
 func move_piece(vec:Vector2)->String:
@@ -131,9 +171,15 @@ func rotate_piece(direction:int):
 	result.resize(n)
 	for i in range(n):
 		result[i].resize(n)
-	for i in range(n):
-		for j in range(n):
-			result[n - j - 1][i] = current_piece.cells[i][j];
+	if direction == COUNTERCLOCKWISE:
+		for i in range(n):
+			for j in range(n):
+				result[n - j - 1][i] = current_piece.cells[i][j]
+	if direction == CLOCKWISE:
+		for i in range(n):
+			for j in range(n):
+				result[j][n - i - 1] = current_piece.cells[i][j]
+	
 	temp=current_piece.cells
 	current_piece.cells=result
 	if is_current_piece_overlapping():#Implement kicking here????? maybe???
@@ -210,15 +256,10 @@ func print_game_grid():
 	print(final_string)
 
 func _on_tick_timer_timeout():
-	#print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
-	#previous_time = Time.get_ticks_msec()
+	print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
+	previous_time = Time.get_ticks_msec()
 	move_piece(Vector2.DOWN)
 
 func game_over():
+	#without call_deferred i was getting errors sometimes, possibly a godot bug?
 	get_tree().call_deferred("change_scene_to_packed", main_scene)
-	#get_tree().change_scene_to_packed(main_scene)
-	
-#func process_timer_timeout():
-	#print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
-	#previous_time = Time.get_ticks_msec()
-	#move_piece(Vector2.DOWN)
