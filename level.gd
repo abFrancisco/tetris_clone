@@ -61,7 +61,6 @@ func _draw():
 	for x in range(next_piece.cells.size()):
 		for y in range(next_piece.cells.size()):
 			if next_piece.cells[y][x] != 0:
-				print("drawing next at (" + str(next_piece.piece_position.x + x) +", " + str(next_piece.piece_position.y + y) + ")")
 				draw_rect(Rect2((x+next_piece.piece_position.x) * cell_size, (y+next_piece.piece_position.y) * cell_size, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
 
 
@@ -124,7 +123,7 @@ func spawn_piece():
 		current_piece.piece_position=Vector2i(grid_width / 2 - current_piece.cells.size() / 2, -1)
 	else:
 		current_piece.piece_position=Vector2i(grid_width / 2 - current_piece.cells.size() / 2 - 1, -1)
-	next_piece.piece_position = Vector2i(200, 50) / 8
+	next_piece.piece_position = Vector2i(200, 50) / 8#this is multiplied somewhere, need to change
 	cycle_bag()
 
 func cycle_bag():
@@ -160,10 +159,16 @@ func move_piece(vec:Vector2i)->String:
 	if overlap != OVERLAP.NONE:
 		current_piece.piece_position -= vec
 		#print("piece_position 1 - "+str(current_piece.piece_position))
-		if vec==Vector2i.DOWN:
+		if overlap == OVERLAP.PIECE or overlap == OVERLAP.FLOOR:
 			commit_current_piece()
 			return_value = "committed"
+		if overlap == OVERLAP.WALL:
+			return_value = "walled"
+		#if vec==Vector2i.DOWN:
+			#commit_current_piece()
+			#return_value = "committed"
 	render()
+	print("return_value = " + str(return_value))
 	return return_value
 
 func rotate_piece(direction:int):
@@ -191,16 +196,20 @@ func rotate_piece(direction:int):
 	overlap = get_current_piece_overlap()
 	if overlap != OVERLAP.NONE:#Implement kicking here????? maybe??
 		if overlap == OVERLAP.WALL:
-			var move_result
-			if current_piece.piece_position.x < 5:
-				move_result = move_piece(Vector2i.RIGHT)#THIS might cause rendering bug, by calling render() inside move_piece()
-				undo_move = Vector2i.LEFT
-			else:
-				move_result = move_piece(Vector2i.LEFT)
-				undo_move = Vector2i.RIGHT
-			if move_result != "moved":
-				move_piece(undo_move)
-				current_piece.cells=temp
+			var move_result = "something"
+			var distance:int = 1
+			while move_result != "moved" and distance <= 2:
+				await get_tree().create_timer(0.5).timeout
+				if current_piece.piece_position.x < 5:
+					move_result = move_piece(Vector2i.RIGHT * distance)#THIS might cause rendering bug, by calling render() inside move_piece()
+					undo_move = Vector2i.LEFT
+				else:
+					move_result = move_piece(Vector2i.LEFT * distance)
+					undo_move = Vector2i.RIGHT
+				distance += 1
+			#if move_result != "moved":
+			#move_piece(undo_move)
+			#current_piece.cells=temp
 	
 
 func get_current_piece_overlap()->OVERLAP:
@@ -211,11 +220,12 @@ func get_current_piece_overlap()->OVERLAP:
 	for x in range(piece_size):
 		for y in range(piece_size):
 			if current_piece.cells[y][x] != 0:
+				print("piece cell (" + str(x) + ", " + str(y) + ") is filled")
 				if (cp_y + y >= 20):
 					return OVERLAP.FLOOR
-				if (cp_x + x < 0 or cp_x + x >= 10):
+				elif (cp_x + x < 0 or cp_x + x >= 10):
 					return OVERLAP.WALL
-				if (cp_y + y >=0):
+				elif (cp_y + y >=0):
 					if (game_grid[cp_x + x][cp_y + y] != 0):
 						return OVERLAP.PIECE
 	return OVERLAP.NONE
@@ -273,8 +283,8 @@ func print_game_grid():
 	print(final_string)
 
 func _on_tick_timer_timeout():
-	print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
-	previous_time = Time.get_ticks_msec()
+	#print("time passed is = " + str(Time.get_ticks_msec() - previous_time))
+	#previous_time = Time.get_ticks_msec()
 	move_piece(Vector2i.DOWN)
 
 func game_over():
