@@ -1,14 +1,16 @@
 extends Node2D
 
 var main_scene:PackedScene = preload("res://main.tscn")
-var cell_size:int = 8
-var cell_margin:int = 2
+@export var grid_position:Vector2i = Vector2i.ZERO
+@export var next_preview_position:Vector2i = Vector2i.ZERO
+@export var cell_size:int = 8
+@export var cell_margin:int = 2
 var grid_height:int = 20
 var grid_width:int = 10
 var game_grid:Array[PackedByteArray]
 const MAX_TICK_TIME = 1.0
-const MIN_TICK_TIME = 0.05
-const DROP_TICK_TIME = 0.05
+const MIN_TICK_TIME = 0.01
+const DROP_TICK_TIME = 0.01
 var tick_time = MAX_TICK_TIME
 
 var previous_time:int
@@ -31,6 +33,9 @@ var bag:Array=[['o', 'i', 'l', 'j', 's', 'z', 't'], ['o', 'i', 'l', 'j', 's', 'z
 enum OVERLAP{NONE, WALL, FLOOR, PIECE}
 
 func _ready():
+	%GridNode.cell_margin = cell_margin / 2
+	%GridNode.cell_size = cell_size
+	%GridNode.grid_position = grid_position
 	previous_time = Time.get_ticks_msec()
 	randomize()
 	fill_game_grid()
@@ -48,20 +53,22 @@ func _ready():
 
 func _draw():
 	#draw commited pieces
+	previous_time = Time.get_ticks_usec()
 	for x in range(game_grid.size()):
 		for y in range(game_grid[0].size()):
 			if game_grid[x][y] != 0:
-				draw_rect(Rect2(x * cell_size, y * cell_size, cell_size - cell_margin, cell_size - cell_margin), Color.DARK_BLUE, true, -1.0, true)
+				draw_rect(Rect2(x * cell_size + grid_position.x, y * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), Color.DARK_BLUE, true, -1.0, true)
 	#draw current piece
 	for x in range(current_piece.cells.size()):
 		for y in range(current_piece.cells.size()):
 			if current_piece.cells[y][x] != 0:
-				draw_rect(Rect2((x+current_piece.piece_position.x) * cell_size, (y+current_piece.piece_position.y) * cell_size, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
+				draw_rect(Rect2((x + current_piece.piece_position.x) * cell_size + grid_position.x, (y + current_piece.piece_position.y) * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
 	#draw next piece
 	for x in range(next_piece.cells.size()):
 		for y in range(next_piece.cells.size()):
 			if next_piece.cells[y][x] != 0:
-				draw_rect(Rect2((x+next_piece.piece_position.x) * cell_size, (y+next_piece.piece_position.y) * cell_size, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
+				draw_rect(Rect2((x + next_piece.piece_position.x) * cell_size + next_preview_position.x + next_piece.preview_offset.x, (y+next_piece.piece_position.y) * cell_size + next_preview_position.y + next_piece.preview_offset.y, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
+	print("_draw time is = " + str(Time.get_ticks_usec() - previous_time))
 
 
 func render():
@@ -119,11 +126,16 @@ func spawn_piece():
 	next_piece.type = selected_piece
 	
 	#set piece position
-	if (current_piece.type == "o" or current_piece.type == "i"):
+	if current_piece.type == "o" or current_piece.type == "i":
 		current_piece.piece_position=Vector2i(grid_width / 2 - current_piece.cells.size() / 2, -1)
 	else:
 		current_piece.piece_position=Vector2i(grid_width / 2 - current_piece.cells.size() / 2 - 1, -1)
-	next_piece.piece_position = Vector2i(200, 50) / 8#this is multiplied somewhere, need to change
+	
+	if next_piece.type == "o":
+		next_piece.preview_offset = Vector2i.RIGHT * cell_size
+	elif next_piece.type != "i":
+		next_piece.preview_offset = Vector2i.RIGHT * cell_size / 2
+	next_piece.piece_position = Vector2i.ZERO
 	cycle_bag()
 
 func cycle_bag():
@@ -168,11 +180,10 @@ func move_piece(vec:Vector2i)->String:
 			#commit_current_piece()
 			#return_value = "committed"
 	render()
-	print("return_value = " + str(return_value))
 	return return_value
 
+#ugly freaking function, too many lines brother
 func rotate_piece(direction:int):
-	#add tests before applying rotation
 	var n:int = current_piece.cells.size()
 	var result:Array[Array]
 	var temp:Array
@@ -188,18 +199,16 @@ func rotate_piece(direction:int):
 		for i in range(n):
 			for j in range(n):
 				result[j][n - i - 1] = current_piece.cells[i][j]
-	
 	temp=current_piece.cells
 	current_piece.cells=result
 	
 	var undo_move:Vector2i = Vector2.ZERO
 	overlap = get_current_piece_overlap()
-	if overlap != OVERLAP.NONE:#Implement kicking here????? maybe??
+	if overlap != OVERLAP.NONE:
 		if overlap == OVERLAP.WALL:
 			var move_result = "something"
 			var distance:int = 1
 			while move_result != "moved" and distance <= 2:
-				await get_tree().create_timer(0.5).timeout
 				if current_piece.piece_position.x < 5:
 					move_result = move_piece(Vector2i.RIGHT * distance)#THIS might cause rendering bug, by calling render() inside move_piece()
 					undo_move = Vector2i.LEFT
@@ -207,10 +216,6 @@ func rotate_piece(direction:int):
 					move_result = move_piece(Vector2i.LEFT * distance)
 					undo_move = Vector2i.RIGHT
 				distance += 1
-			#if move_result != "moved":
-			#move_piece(undo_move)
-			#current_piece.cells=temp
-	
 
 func get_current_piece_overlap()->OVERLAP:
 	#check if piece is overllaping the map commited pieces.
@@ -220,7 +225,6 @@ func get_current_piece_overlap()->OVERLAP:
 	for x in range(piece_size):
 		for y in range(piece_size):
 			if current_piece.cells[y][x] != 0:
-				print("piece cell (" + str(x) + ", " + str(y) + ") is filled")
 				if (cp_y + y >= 20):
 					return OVERLAP.FLOOR
 				elif (cp_x + x < 0 or cp_x + x >= 10):
@@ -239,7 +243,6 @@ func check_lines(lines:Array):
 				count += 1
 		if count == 10:
 			line_clear_queue.append(y)
-	print("line clear queue = " + str(line_clear_queue))
 	clear_lines(line_clear_queue)
 	squash_lines(line_clear_queue)
 
@@ -259,13 +262,11 @@ func squash_lines(lines:Array):#squashing one at a time, might be improved later
 func commit_current_piece():
 	var commited_lines:Array=Array()
 	var piece_size:int=current_piece.cells.size()
-	print("------------------------------")
 	for x in range(piece_size):
 		for y in range(piece_size):
 			if current_piece.cells[y][x] != 0:
 				if not commited_lines.has(current_piece.piece_position.y + y):
 					commited_lines.append(current_piece.piece_position.y + y)
-				print("commiting line -> " + str(current_piece.piece_position.y + y))
 				game_grid[current_piece.piece_position.x + x][current_piece.piece_position.y + y] = 1
 	for y in commited_lines:
 		if y <= 0:

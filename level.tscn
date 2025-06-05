@@ -1,17 +1,99 @@
-[gd_scene load_steps=3 format=3 uid="uid://c1r5xhwpblk0r"]
+[gd_scene load_steps=4 format=3 uid="uid://c1r5xhwpblk0r"]
 
 [ext_resource type="Script" uid="uid://bl4lqvy4asceq" path="res://level.gd" id="1_u52ul"]
 [ext_resource type="Script" uid="uid://dqpjmknt76tad" path="res://grid_node.gd" id="2_vonw3"]
+[ext_resource type="Texture2D" uid="uid://bxe2k7wxd2gc8" path="res://nine_patch_test_2.png" id="3_oi3di"]
 
 [node name="Level" type="Node2D"]
 script = ExtResource("1_u52ul")
+grid_position = Vector2i(120, 10)
+next_preview_position = Vector2i(257, 65)
 
 [node name="TickTimer" type="Timer" parent="."]
 unique_name_in_owner = true
 autostart = true
 
-[node name="grid_node" type="Node2D" parent="."]
+[node name="GridNode" type="Node2D" parent="."]
+unique_name_in_owner = true
 z_index = -1
 script = ExtResource("2_vonw3")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NinePatchRect" type="NinePatchRect" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.3
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_oi3di")
+region_rect = Rect2(3, 3, 66, 66)
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="NinePatchRect2" type="NinePatchRect" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_right = 0.7
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_oi3di")
+region_rect = Rect2(3, 3, 66, 66)
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="NinePatchRect3" type="NinePatchRect" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.7
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_oi3di")
+region_rect = Rect2(3, 3, 66, 66)
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="NinePatchRect4" type="NinePatchRect" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.775
+anchor_top = 0.3
+anchor_right = 0.925
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_oi3di")
+region_rect = Rect2(3, 3, 66, 66)
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
 [connection signal="timeout" from="TickTimer" to="." method="_on_tick_timer_timeout"]
