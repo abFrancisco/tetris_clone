@@ -9,13 +9,14 @@ var grid_height:int = 20
 var grid_width:int = 10
 var game_grid:Array[PackedByteArray]
 const MAX_TICK_TIME = 1.0
-const MIN_TICK_TIME = 0.01
-const DROP_TICK_TIME = 0.01
+const MIN_TICK_TIME = 0.04
+const DROP_TICK_TIME = 0.04
 var tick_time = MAX_TICK_TIME
 
 var previous_time:int
 var timer_clock:float = 0.0
 
+enum PIECE_INDEX{O, I, L, J, S, Z, T}
 var pieces:Dictionary[String, Array]={
 	"o":[[1, 1], [1, 1]],
 	"i":[[0, 0, 0, 0],[1, 1, 1, 1],[0, 0, 0 ,0],[0, 0, 0, 0]],
@@ -25,6 +26,16 @@ var pieces:Dictionary[String, Array]={
 	"z":[[1, 1, 0], [0, 1, 1], [0, 0, 0]],
 	"t":[[0, 1, 0], [1, 1, 1], [0, 0, 0]]
 }
+var piece_color_index:Dictionary[String, int]={
+	"o":1,
+	"i":2,
+	"l":3,
+	"j":4,
+	"s":5,
+	"z":6,
+	"t":7
+}
+var piece_colors:Array[Color] = [Color.BLACK, Color.YELLOW, Color.CYAN ,Color.DARK_ORANGE, Color.DARK_BLUE, Color.GREEN, Color.RED, Color.REBECCA_PURPLE]
 var current_piece:tetromino=null
 var next_piece:tetromino=null
 var piece_index:int=0
@@ -57,17 +68,17 @@ func _draw():
 	for x in range(game_grid.size()):
 		for y in range(game_grid[0].size()):
 			if game_grid[x][y] != 0:
-				draw_rect(Rect2(x * cell_size + grid_position.x, y * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), Color.DARK_BLUE, true, -1.0, true)
+				draw_rect(Rect2(x * cell_size + grid_position.x, y * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[game_grid[x][y]], true, -1.0, true)
 	#draw current piece
 	for x in range(current_piece.cells.size()):
 		for y in range(current_piece.cells.size()):
 			if current_piece.cells[y][x] != 0:
-				draw_rect(Rect2((x + current_piece.piece_position.x) * cell_size + grid_position.x, (y + current_piece.piece_position.y) * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
+				draw_rect(Rect2((x + current_piece.piece_position.x) * cell_size + grid_position.x, (y + current_piece.piece_position.y) * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[current_piece.color_index], true, -1.0, true)
 	#draw next piece
 	for x in range(next_piece.cells.size()):
 		for y in range(next_piece.cells.size()):
 			if next_piece.cells[y][x] != 0:
-				draw_rect(Rect2((x + next_piece.piece_position.x) * cell_size + next_preview_position.x + next_piece.preview_offset.x, (y+next_piece.piece_position.y) * cell_size + next_preview_position.y + next_piece.preview_offset.y, cell_size - cell_margin, cell_size - cell_margin), Color.RED, true, -1.0, true)
+				draw_rect(Rect2((x + next_piece.piece_position.x) * cell_size + next_preview_position.x + next_piece.preview_offset.x, (y+next_piece.piece_position.y) * cell_size + next_preview_position.y + next_piece.preview_offset.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[next_piece.color_index], true, -1.0, true)
 	print("_draw time is = " + str(Time.get_ticks_usec() - previous_time))
 
 
@@ -116,6 +127,7 @@ func spawn_piece():
 	if next_piece == null:
 		current_piece = tetromino.new()
 		current_piece.cells = pieces.get(selected_piece)
+		current_piece.color_index = piece_color_index.get(selected_piece)
 		current_piece.type = selected_piece
 		cycle_bag()
 		selected_piece = bag[bag_index][piece_index]
@@ -123,6 +135,7 @@ func spawn_piece():
 		current_piece = next_piece
 	next_piece = tetromino.new()
 	next_piece.cells = pieces.get(selected_piece)
+	next_piece.color_index = piece_color_index.get(selected_piece)
 	next_piece.type = selected_piece
 	
 	#set piece position
@@ -267,7 +280,9 @@ func commit_current_piece():
 			if current_piece.cells[y][x] != 0:
 				if not commited_lines.has(current_piece.piece_position.y + y):
 					commited_lines.append(current_piece.piece_position.y + y)
-				game_grid[current_piece.piece_position.x + x][current_piece.piece_position.y + y] = 1
+				var piece_color_index = current_piece.color_index
+				game_grid[current_piece.piece_position.x + x][current_piece.piece_position.y + y] = piece_color_index
+				
 	for y in commited_lines:
 		if y <= 0:
 			game_over()
