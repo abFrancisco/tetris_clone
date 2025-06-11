@@ -1,10 +1,11 @@
 extends Node2D
 
 var main_scene:PackedScene = preload("res://main.tscn")
+
 @export var grid_position:Vector2i = Vector2i.ZERO
 @export var next_preview_position:Vector2i = Vector2i.ZERO
-@export var cell_size:int = 8
-@export var cell_margin:int = 2
+@export var cell_size:float = 8
+@export var cell_margin:float = 2
 var grid_height:int = 20
 var grid_width:int = 10
 var game_grid:Array[PackedByteArray]
@@ -68,17 +69,17 @@ func _draw():
 	for x in range(game_grid.size()):
 		for y in range(game_grid[0].size()):
 			if game_grid[x][y] != 0:
-				draw_rect(Rect2(x * cell_size + grid_position.x, y * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[game_grid[x][y]], true, -1.0, true)
+				draw_rect(Rect2(x * cell_size + grid_position.x, y * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[game_grid[x][y]], true, 0.5, false)
 	#draw current piece
 	for x in range(current_piece.cells.size()):
 		for y in range(current_piece.cells.size()):
 			if current_piece.cells[y][x] != 0:
-				draw_rect(Rect2((x + current_piece.piece_position.x) * cell_size + grid_position.x, (y + current_piece.piece_position.y) * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[current_piece.color_index], true, -1.0, true)
+				draw_rect(Rect2((x + current_piece.piece_position.x) * cell_size + grid_position.x, (y + current_piece.piece_position.y) * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[current_piece.color_index], true, 0.5, false)
 	#draw next piece
 	for x in range(next_piece.cells.size()):
 		for y in range(next_piece.cells.size()):
 			if next_piece.cells[y][x] != 0:
-				draw_rect(Rect2((x + next_piece.piece_position.x) * cell_size + next_preview_position.x + next_piece.preview_offset.x, (y+next_piece.piece_position.y) * cell_size + next_preview_position.y + next_piece.preview_offset.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[next_piece.color_index], true, -1.0, true)
+				draw_rect(Rect2((x + next_piece.piece_position.x) * cell_size + next_preview_position.x + next_piece.preview_offset.x, (y+next_piece.piece_position.y) * cell_size + next_preview_position.y + next_piece.preview_offset.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[next_piece.color_index], true, 0.5, false)
 	print("_draw time is = " + str(Time.get_ticks_usec() - previous_time))
 
 
