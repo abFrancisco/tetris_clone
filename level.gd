@@ -124,7 +124,7 @@ func fill_game_grid():
 		game_grid.append(row)
 
 func spawn_piece():
-	#instance the piece
+	%TickTimer.start()
 	var selected_piece:String = bag[bag_index][piece_index]
 	if next_piece == null:
 		current_piece = tetromino.new()
