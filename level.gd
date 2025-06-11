@@ -74,7 +74,8 @@ func _draw():
 	for x in range(current_piece.cells.size()):
 		for y in range(current_piece.cells.size()):
 			if current_piece.cells[y][x] != 0:
-				draw_rect(Rect2((x + current_piece.piece_position.x) * cell_size + grid_position.x, (y + current_piece.piece_position.y) * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[current_piece.color_index], true, 0.5, false)
+				if current_piece.piece_position.y + y >= 0:
+					draw_rect(Rect2((x + current_piece.piece_position.x) * cell_size + grid_position.x, (y + current_piece.piece_position.y) * cell_size + grid_position.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[current_piece.color_index], true, 0.5, false)
 	#draw next piece
 	for x in range(next_piece.cells.size()):
 		for y in range(next_piece.cells.size()):
