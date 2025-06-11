@@ -25,7 +25,6 @@ ui_nine_margin = 4
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="UI" type="Control" parent="CanvasLayer"]
-visible = false
 modulate = Color(0, 0, 0, 1)
 layout_mode = 3
 anchors_preset = 15
@@ -35,6 +34,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="NinePatchRect" type="NinePatchRect" parent="CanvasLayer/UI"]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.3
@@ -51,6 +51,7 @@ axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
 [node name="NinePatchRect2" type="NinePatchRect" parent="CanvasLayer/UI"]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -68,6 +69,7 @@ axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
 [node name="NinePatchRect3" type="NinePatchRect" parent="CanvasLayer/UI"]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.7
@@ -85,6 +87,7 @@ axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
 [node name="NinePatchRect4" type="NinePatchRect" parent="CanvasLayer/UI"]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.775
@@ -101,5 +104,20 @@ patch_margin_right = 8
 patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
+
+[node name="Score" type="Label" parent="CanvasLayer/UI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="Level" type="Label" parent="CanvasLayer/UI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="Lines" type="Label" parent="CanvasLayer/UI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
 
 [connection signal="timeout" from="TickTimer" to="." method="_on_tick_timer_timeout"]
