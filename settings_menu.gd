@@ -35,6 +35,7 @@ func _on_SFX_text_submitted(new_text):
 	var value = new_text.to_int()
 	if value >= 0 and value <= 100:
 		%SFXSlider.value = value
+		%SFXText.text = str(value)
 	elif value > 100:
 		%SFXText.text = "100"
 		%SFXSlider.value = 100
@@ -46,6 +47,7 @@ func _on_music_text_submitted(new_text):
 	var value = new_text.to_int()
 	if value >= 0 and value <= 100:
 		%MusicSlider.value = value
+		%MusicText.text = str(value)
 	elif value > 100:
 		%MusicText.text = "100"
 		%SFXSlider.value = 100

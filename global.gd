@@ -36,7 +36,6 @@ func update_audio_volume(sfx:int = -1, music:int = -1):
 		sfx_volume = sfx
 	if music >= 0 and music <= 100:
 		music_volume = music
-		
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), sfx_volume)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), music_volume)
 	save_settings()
