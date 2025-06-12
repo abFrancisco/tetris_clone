@@ -13,4 +13,4 @@ func _draw():
 			draw_rect(Rect2(x * cell_size - cell_margin + grid_position.x, y * cell_size - cell_margin + grid_position.y, cell_size, cell_size), Color("#aaaaaa"), false, 0.5, false)
 	for nine_patch:NinePatchRect in ui_nine_patch_rects:
 		var patch_rect:Rect2i = Rect2i(nine_patch.position, nine_patch.size).grow(-ui_nine_margin)
-		draw_rect(patch_rect, Color("#e9e9e9"), false, 0.5, true)
+		draw_rect(patch_rect, Color("#efefef"), false, 0.5, true)

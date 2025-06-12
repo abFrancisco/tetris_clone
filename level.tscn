@@ -25,7 +25,6 @@ ui_nine_margin = 4
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="UI" type="Control" parent="CanvasLayer"]
-modulate = Color(0, 0, 0, 1)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -106,18 +105,33 @@ axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
 [node name="Score" type="Label" parent="CanvasLayer/UI"]
+unique_name_in_owner = true
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+offset_left = 8.0
+offset_top = 5.0
+offset_right = 48.0
+offset_bottom = 28.0
+theme_override_colors/font_color = Color(0.937255, 0.937255, 0.937255, 1)
+text = "0"
 
 [node name="Level" type="Label" parent="CanvasLayer/UI"]
+unique_name_in_owner = true
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+offset_left = 8.0
+offset_top = 32.0
+offset_right = 48.0
+offset_bottom = 55.0
+theme_override_colors/font_color = Color(0.937255, 0.937255, 0.937255, 1)
+text = "1"
 
 [node name="Lines" type="Label" parent="CanvasLayer/UI"]
+unique_name_in_owner = true
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+offset_left = 9.0
+offset_top = 61.0
+offset_right = 49.0
+offset_bottom = 84.0
+theme_override_colors/font_color = Color(0.937255, 0.937255, 0.937255, 1)
+text = "0"
 
 [connection signal="timeout" from="TickTimer" to="." method="_on_tick_timer_timeout"]
