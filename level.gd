@@ -180,7 +180,9 @@ func move_piece(vec:Vector2i)->String:
 	var overlap:OVERLAP
 	current_piece.piece_position += vec
 	overlap = get_current_piece_overlap()
-	if overlap != OVERLAP.NONE:
+	if overlap == OVERLAP.NONE:
+		current_piece.last_move = tetromino.MOVE_TYPE.MOVE
+	else:
 		current_piece.piece_position -= vec
 		if overlap == OVERLAP.FLOOR:#overlap == OVERLAP.PIECE or overlap == OVERLAP.FLOOR:
 			commit_current_piece()
@@ -191,8 +193,6 @@ func move_piece(vec:Vector2i)->String:
 		if overlap == OVERLAP.WALL:
 			return_value = "walled"
 	render()
-	print("piece moved")
-	current_piece.last_move = tetromino.MOVE_TYPE.MOVE
 	return return_value
 
 #ugly freaking function, too many lines brother
@@ -282,11 +282,13 @@ func score_lines(lines:Array):
 	if cleared_lines >= level * 10:
 		level_up()
 	if current_piece.type == "t":#change this to check t spin instead of piece type="t"
+		print("checking for t spin")
+		print("current_piece.last_move = " + str(current_piece.last_move))
 		if current_piece.last_move == tetromino.MOVE_TYPE.ROTATE:
 			var count:int = 0
 			for x:int in [0, 2]:
 				for y:int in [0, 2]:
-					if game_grid[x][y] != 0:
+					if game_grid[current_piece.piece_position.x + x][current_piece.piece_position.y + y] != 0:
 						count += 1
 			if count >= 3:
 				if line_count == 1:
@@ -294,7 +296,7 @@ func score_lines(lines:Array):
 				else:
 					score_update(1600 * level, "T-Sping Double")
 		pass#check for tspin
-	if line_count == 1:
+	elif line_count == 1:
 		score_update(100 * level, "Single")
 	elif line_count == 2:
 		score_update(300 * level, "Double")
