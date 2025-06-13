@@ -5,3 +5,5 @@ var piece_position:Vector2i = Vector2i.ZERO
 var type:String
 var color_index:int = 1
 var preview_offset:Vector2i = Vector2i.ZERO
+enum MOVE_TYPE{MOVE, ROTATE}
+var last_move:MOVE_TYPE = MOVE_TYPE.MOVE

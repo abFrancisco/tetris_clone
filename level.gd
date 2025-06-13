@@ -83,7 +83,6 @@ func _draw():
 		for y in range(next_piece.cells.size()):
 			if next_piece.cells[y][x] != 0:
 				draw_rect(Rect2((x + next_piece.piece_position.x) * cell_size + next_preview_position.x + next_piece.preview_offset.x, (y+next_piece.piece_position.y) * cell_size + next_preview_position.y + next_piece.preview_offset.y, cell_size - cell_margin, cell_size - cell_margin), piece_colors[next_piece.color_index], true, -1.0, false)
-	print("_draw time is = " + str(Time.get_ticks_usec() - previous_time))
 
 func render():
 	queue_redraw()
@@ -146,10 +145,11 @@ func spawn_piece():
 		current_piece.piece_position=Vector2i(grid_width / 2 - current_piece.cells.size() / 2, -1)
 	else:
 		current_piece.piece_position=Vector2i(grid_width / 2 - current_piece.cells.size() / 2 - 1, -1)
-	
 	if next_piece.type == "o":
 		next_piece.preview_offset = Vector2i.RIGHT * cell_size
-	elif next_piece.type != "i":
+	elif next_piece.type == "i":
+		next_piece.preview_offset = Vector2i.UP * cell_size / 2
+	else:
 		next_piece.preview_offset = Vector2i.RIGHT * cell_size / 2
 	next_piece.piece_position = Vector2i.ZERO
 	cycle_bag()
@@ -182,12 +182,17 @@ func move_piece(vec:Vector2i)->String:
 	overlap = get_current_piece_overlap()
 	if overlap != OVERLAP.NONE:
 		current_piece.piece_position -= vec
-		if overlap == OVERLAP.PIECE or overlap == OVERLAP.FLOOR:
+		if overlap == OVERLAP.FLOOR:#overlap == OVERLAP.PIECE or overlap == OVERLAP.FLOOR:
+			commit_current_piece()
+			return_value = "committed"
+		elif overlap == OVERLAP.PIECE and vec == Vector2i.DOWN:
 			commit_current_piece()
 			return_value = "committed"
 		if overlap == OVERLAP.WALL:
 			return_value = "walled"
 	render()
+	print("piece moved")
+	current_piece.last_move = tetromino.MOVE_TYPE.MOVE
 	return return_value
 
 #ugly freaking function, too many lines brother
@@ -207,8 +212,6 @@ func rotate_piece(direction:int):
 			for j in range(n):
 				result[j][n - i - 1] = current_piece.cells[i][j]
 	current_piece.cells=result
-	
-	#var undo_move:Vector2i = Vector2.ZERO
 	overlap = get_current_piece_overlap()
 	if overlap != OVERLAP.NONE:
 		if overlap == OVERLAP.WALL:
@@ -217,11 +220,10 @@ func rotate_piece(direction:int):
 			while move_result != "moved" and distance <= 2:
 				if current_piece.piece_position.x < 5:
 					move_result = move_piece(Vector2i.RIGHT * distance)#THIS might cause rendering bug, by calling render() inside move_piece()
-					#undo_move = Vector2i.LEFT
 				else:
 					move_result = move_piece(Vector2i.LEFT * distance)
-					#undo_move = Vector2i.RIGHT
 				distance += 1
+	current_piece.last_move = tetromino.MOVE_TYPE.ROTATE
 
 func get_current_piece_overlap()->OVERLAP:
 	#check if piece is overllaping the map commited pieces.
@@ -280,6 +282,17 @@ func score_lines(lines:Array):
 	if cleared_lines >= level * 10:
 		level_up()
 	if current_piece.type == "t":#change this to check t spin instead of piece type="t"
+		if current_piece.last_move == tetromino.MOVE_TYPE.ROTATE:
+			var count:int = 0
+			for x:int in [0, 2]:
+				for y:int in [0, 2]:
+					if game_grid[x][y] != 0:
+						count += 1
+			if count >= 3:
+				if line_count == 1:
+					score_update(400 * level, "T-Spin Single")
+				else:
+					score_update(1600 * level, "T-Sping Double")
 		pass#check for tspin
 	if line_count == 1:
 		score_update(100 * level, "Single")
