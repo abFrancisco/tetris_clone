@@ -1,0 +1,91 @@
+[gd_scene load_steps=6 format=3 uid="uid://8pvri3va13mj"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4xowi"]
+shading_mode = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_4xowi"]
+material = SubResource("StandardMaterial3D_4xowi")
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_a202f"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_noarx"]
+size = Vector3(10, 1, 10)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_a0tk4"]
+data = PackedVector3Array(-5, 0.5, 5, 5, 0.5, 5, -5, -0.5, 5, 5, 0.5, 5, 5, -0.5, 5, -5, -0.5, 5, 5, 0.5, -5, -5, 0.5, -5, 5, -0.5, -5, -5, 0.5, -5, -5, -0.5, -5, 5, -0.5, -5, 5, 0.5, 5, 5, 0.5, -5, 5, -0.5, 5, 5, 0.5, -5, 5, -0.5, -5, 5, -0.5, 5, -5, 0.5, -5, -5, 0.5, 5, -5, -0.5, -5, -5, 0.5, 5, -5, -0.5, 5, -5, -0.5, -5, 5, 0.5, 5, -5, 0.5, 5, 5, 0.5, -5, -5, 0.5, 5, -5, 0.5, -5, 5, 0.5, -5, -5, -0.5, 5, 5, -0.5, 5, -5, -0.5, -5, 5, -0.5, 5, 5, -0.5, -5, -5, -0.5, -5)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2096, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
+mesh = SubResource("SphereMesh_4xowi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+shape = SubResource("SphereShape3D_a202f")
+
+[node name="RigidBody3D2" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.836462, 2.17483, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D2"]
+mesh = SubResource("SphereMesh_4xowi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D2"]
+shape = SubResource("SphereShape3D_a202f")
+
+[node name="RigidBody3D3" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.176105, 3.12854, 0.179443)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D3"]
+mesh = SubResource("SphereMesh_4xowi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D3"]
+shape = SubResource("SphereShape3D_a202f")
+
+[node name="RigidBody3D4" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.53533, 3.12854, 0.179443)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D4"]
+mesh = SubResource("SphereMesh_4xowi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D4"]
+shape = SubResource("SphereShape3D_a202f")
+
+[node name="RigidBody3D5" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.53533, 3.12854, 1.14134)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D5"]
+mesh = SubResource("SphereMesh_4xowi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D5"]
+shape = SubResource("SphereShape3D_a202f")
+
+[node name="RigidBody3D6" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.447924, 3.12854, 1.14134)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D6"]
+mesh = SubResource("SphereMesh_4xowi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D6"]
+shape = SubResource("SphereShape3D_a202f")
+
+[node name="RigidBody3D7" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.785964, 1.77933, 1.14134)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D7"]
+mesh = SubResource("SphereMesh_4xowi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D7"]
+shape = SubResource("SphereShape3D_a202f")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.987278, 0.159002, 0, -0.159002, 0.987278, 0, 1.23689, 4.42323)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
+mesh = SubResource("BoxMesh_noarx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_a0tk4")
